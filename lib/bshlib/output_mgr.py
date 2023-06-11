@@ -1,5 +1,5 @@
 from pathlib import Path
-from os import makedirs, mkdir, listdir, remove
+from os import makedirs, mkdir
 from re import compile, match
 
 from typing import TextIO
@@ -61,21 +61,32 @@ class OutputMgr:
     def clear(self, task):
         """Clears task directory.
         """
-        for ch in (self.root / task):
+        for ch in (self.root / task).iterdir():
             ch.unlink()
+
+    # TODO
+    def rearrange(self):
+        """Rename the task files so they follow a sequential order again. Useful for gaps in the numeric naming sequence
+        caused by file deletion."""
 
     def next_num(self, task):
         """Get next file number for task file.
         """
         taskdir = self.root / task
-        if not taskdir.exists() or len(listdir(taskdir)) == 0:
+        taskdir_elems = list(taskdir.iterdir())
+        rx0 = compile(task + r'_\d+')
+        pred = lambda e: rx0.match(e.stem) is not None
+        taskdir_elems = list(filter(pred, taskdir_elems))
+
+        if not taskdir.exists() or len(taskdir_elems) == 0:
             num = 0
         else:
-            rx = compile(r'_(\d+)')
+            rx1 = compile(r'.*_(\d+)')
             nums = []
-            for ch in taskdir.iterdir():
-                nums.append(int(match(rx, ch.stem).group(0)))
+            for ch in taskdir_elems:
+                nums.append(int(rx1.match(ch.stem).group(1)))
             num = max(nums) + 1
+
         return num
 
     def __strong_open(self, path, mode):
