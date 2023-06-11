@@ -64,8 +64,28 @@ class OutputMgr:
         for ch in (self.root / task).iterdir():
             ch.unlink()
 
+    def conventional(self, task):
+        """Return a list of paths of every file that follows the numeric sequence filename convention.
+
+        Parameters
+        -----
+        task : `str`
+            Task.
+
+        Returns
+        -----
+        ret : `list` of `Path`
+            Paths of conventional files.
+        """
+        taskdir = self.root / task
+        good_files = list(taskdir.iterdir())
+        rx0 = compile(task + r'_\d+')
+        pred = lambda e: rx0.match(e.stem) is not None
+        good_files = list(filter(pred, good_files))
+        return good_files
+
     # TODO
-    def rearrange(self):
+    def rearrange(self, task):
         """Rename the task files so they follow a sequential order again. Useful for gaps in the numeric naming sequence
         caused by file deletion."""
 
@@ -73,17 +93,14 @@ class OutputMgr:
         """Get next file number for task file.
         """
         taskdir = self.root / task
-        taskdir_elems = list(taskdir.iterdir())
-        rx0 = compile(task + r'_\d+')
-        pred = lambda e: rx0.match(e.stem) is not None
-        taskdir_elems = list(filter(pred, taskdir_elems))
+        files = self.conventional(task)
 
-        if not taskdir.exists() or len(taskdir_elems) == 0:
+        if not taskdir.exists() or len(files) == 0:
             num = 0
         else:
             rx1 = compile(r'.*_(\d+)')
             nums = []
-            for ch in taskdir_elems:
+            for ch in files:
                 nums.append(int(rx1.match(ch.stem).group(1)))
             num = max(nums) + 1
 
