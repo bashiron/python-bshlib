@@ -1,5 +1,5 @@
 from pathlib import Path
-from os import makedirs, mkdir
+from os import mkdir
 from re import compile
 from os import rename
 
@@ -21,7 +21,13 @@ class OutputMgr:
 
     def create_root(self):
         try:
-            makedirs(self.root)
+            mkdir(self.root)
+        except FileExistsError:
+            print('directory exists. skipping..')
+
+    def create_task_root(self, task):
+        try:
+            mkdir(self.root / task)
         except FileExistsError:
             print('directory exists. skipping..')
 
@@ -101,7 +107,7 @@ class OutputMgr:
         ordered.sort(key=lambda e: e[1])
 
         i = 0
-        for path in ordered:
+        for path, _ in ordered:
             rename(path, path.with_stem(f"{task}_{i}"))
             i += 1
 
