@@ -1,23 +1,28 @@
 from pathlib import Path
 from os import mkdir
 from re import compile
-from os import rename
+from os import rename, PathLike
 
 from typing import TextIO
 
 
 class OutputMgr:
+    root: Path
 
-    def __init__(self, pj_root, out_path='output'):
+    def __init__(self, out_root):
         """
         Parameters
         -----
-        pj_root : Path
-            Project's root directory.
-        out_path : str
-            Relative path from the project's root where the manager will operate.
+        out_root : `PathLike[str]` or `str`
+            Output root from where the manager will operate.
         """
-        self.root = pj_root / out_path
+        match out_root:
+            case Path():
+                self.root = out_root
+            case PathLike() | str():
+                self.root = Path(out_root)
+            case _:
+                raise TypeError
 
     def create_root(self):
         try:
