@@ -1,8 +1,10 @@
 from pathlib import Path
 from os import makedirs, mkdir
-from re import compile, match
+from re import compile
+from os import rename
 
 from typing import TextIO
+
 
 class OutputMgr:
 
@@ -79,15 +81,29 @@ class OutputMgr:
         """
         taskdir = self.root / task
         good_files = list(taskdir.iterdir())
-        rx0 = compile(task + r'_\d+')
-        pred = lambda e: rx0.match(e.stem) is not None
+        rx = compile(task + r'_\d+')
+        pred = lambda e: rx.match(e.stem) is not None
         good_files = list(filter(pred, good_files))
         return good_files
 
-    # TODO
     def rearrange(self, task):
         """Rename the task files so they follow a sequential order again. Useful for gaps in the numeric naming sequence
-        caused by file deletion."""
+        caused by file deletion.
+
+        Parameters
+        -----
+        task : `str`
+            Task.
+        """
+        files = self.conventional(task)
+        nums = map(lambda e: self.extract_number(e), files)
+        ordered = list(zip(files, nums))
+        ordered.sort(key=lambda e: e[1])
+
+        i = 0
+        for path in ordered:
+            rename(path, path.with_stem(f"{task}_{i}"))
+            i += 1
 
     def next_num(self, task):
         """Get next file number for task file.
@@ -98,13 +114,19 @@ class OutputMgr:
         if not taskdir.exists() or len(files) == 0:
             num = 0
         else:
-            rx1 = compile(r'.*_(\d+)')
-            nums = []
-            for ch in files:
-                nums.append(int(rx1.match(ch.stem).group(1)))
-            num = max(nums) + 1
-
+            num = max([self.extract_number(ch) for ch in files]) + 1
         return num
+
+    def extract_number(self, path):
+        """Extract the sequence number from the file.
+
+        Parameters
+        -----
+        path : `Path`
+            Path of the file to extract from.
+        """
+        rx = compile(r'.*_(\d+)')
+        return int(rx.match(path.stem).group(1))
 
     def __strong_open(self, path, mode):
         """Open file, creating parent directory if doesn't exist.
