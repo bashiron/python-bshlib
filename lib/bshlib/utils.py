@@ -1,6 +1,8 @@
 import re
 from re import sub
 
+# ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
+
 MONTH_MAP = {
     1: 'Enero',
     2: 'Febrero',
@@ -15,6 +17,18 @@ MONTH_MAP = {
     11: 'Noviembre',
     12: 'Diciembre'
 }
+
+WEEKDAY_MAP = {
+    0: 'Lunes',
+    1: 'Martes',
+    2: 'Miércoles',
+    3: 'Jueves',
+    4: 'Viernes',
+    5: 'Sábado',
+    6: 'Domingo'
+}
+
+# ----- FUNCTIONS
 
 def get_methods(obj, spacing=20):
     """Expose object methods.
