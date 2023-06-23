@@ -2,6 +2,7 @@ import re
 from re import sub
 from pathlib import Path
 import cv2 as cv
+from os import PathLike
 
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
@@ -77,7 +78,7 @@ def vid_duration(video):
 
     Parameters
     -----
-    video : `str`
+    video : `PathLike[str]` or `str`
         Path to video.
 
     Returns
@@ -85,5 +86,13 @@ def vid_duration(video):
     ret : `int`
         Number of seconds.
     """
+    match video:
+        case str():
+            pass
+        case PathLike():
+            video = str(video)
+        case _:
+            raise TypeError
+
     vid = cv.VideoCapture(video)
     return vid.get(cv.CAP_PROP_FRAME_COUNT) / vid.get(cv.CAP_PROP_FPS)
