@@ -1,5 +1,7 @@
 import re
 from re import sub
+from pathlib import Path
+import cv2 as cv
 
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
@@ -61,3 +63,27 @@ def gsub_file(path, pattern: re.Pattern, replacement):
     content = sub(pattern, replacement, content)
     file.write(content)
     file.close()
+
+def try_birthttime(path: Path):
+    try:
+        # get birth time (many times not available)
+        return path.stat().st_birthtime
+    except AttributeError:
+        # get modification time
+        return path.stat().st_mtime
+
+def vid_duration(video):
+    """Return video duration in seconds.
+
+    Parameters
+    -----
+    video : `str`
+        Path to video.
+
+    Returns
+    -----
+    ret : `int`
+        Number of seconds.
+    """
+    vid = cv.VideoCapture(video)
+    return vid.get(cv.CAP_PROP_FRAME_COUNT) / vid.get(cv.CAP_PROP_FPS)

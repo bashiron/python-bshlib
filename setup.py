@@ -16,6 +16,7 @@ setup(
     install_requires=[
         'pandas==2.0.1',
         'more-itertools==9.0.0',
-        'loguru==0.7.0'
+        'loguru==0.7.0',
+        'opencv-python==4.7.0.72'
     ],
 )
