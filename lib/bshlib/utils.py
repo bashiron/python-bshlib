@@ -41,23 +41,27 @@ def pathlike_compatible(fun):
     """Convert `PathLike` args to `str`.
     """
 
-    def convert_p(arg):
+    def cnv_p(arg):
+        """Convert positional argument.
+        """
         match arg:
             case PathLike():
                 return str(arg)
             case _:
                 return arg
 
-    def convert_k(tup):
-        match tup:
-            case (name, PathLike() as val):
-                return name, str(val)
-            case tup:
-                return tup
+    def cnv_k(kwarg):
+        """Convert keyword argument.
+        """
+        match kwarg:
+            case (k, PathLike() as v):
+                return k, str(v)
+            case kwarg:
+                return kwarg
 
     def wrapper(*args, **kwargs):
-        args = tuple(map(convert_p, args))
-        kwargs = dict(map(convert_k, kwargs.items()))
+        args = tuple(map(cnv_p, args))
+        kwargs = dict(map(cnv_k, kwargs.items()))
         return fun(*args, **kwargs)
 
     return wrapper
