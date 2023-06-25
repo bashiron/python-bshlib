@@ -1,8 +1,11 @@
 import re
-from re import sub
 from pathlib import Path
 import cv2 as cv
+from os import stat
+from datetime import datetime, timedelta
+
 from os import PathLike
+from datetime import timezone
 
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
@@ -30,6 +33,34 @@ WEEKDAY_MAP = {
     5: 'Sábado',
     6: 'Domingo'
 }
+
+# ----- DECORATORS
+
+# TODO: other possible behavior: the decorator takes a string param with the name of the PathLike param to convert
+def pathlike_compatible(fun):
+    """Convert `PathLike` args to `str`.
+    """
+
+    def convert_p(arg):
+        match arg:
+            case PathLike():
+                return str(arg)
+            case _:
+                return arg
+
+    def convert_k(tup):
+        match tup:
+            case (name, PathLike() as val):
+                return name, str(val)
+            case tup:
+                return tup
+
+    def wrapper(*args, **kwargs):
+        args = tuple(map(convert_p, args))
+        kwargs = dict(map(convert_k, kwargs.items()))
+        return fun(*args, **kwargs)
+
+    return wrapper
 
 # ----- FUNCTIONS
 
@@ -61,7 +92,7 @@ def gsub_file(path, pattern: re.Pattern, replacement):
     content = ''.join(content)
     file.truncate(0)
     file.seek(0)  # not necessary but just in case
-    content = sub(pattern, replacement, content)
+    content = re.sub(pattern, replacement, content)
     file.write(content)
     file.close()
 
@@ -73,6 +104,7 @@ def try_birthttime(path: Path):
         # get modification time
         return path.stat().st_mtime
 
+@pathlike_compatible
 def vid_duration(video):
     """Return video duration in seconds.
 
@@ -86,13 +118,31 @@ def vid_duration(video):
     ret : `int`
         Number of seconds.
     """
-    match video:
-        case str():
-            pass
-        case PathLike():
-            video = str(video)
-        case _:
-            raise TypeError
-
     vid = cv.VideoCapture(video)
     return vid.get(cv.CAP_PROP_FRAME_COUNT) / vid.get(cv.CAP_PROP_FPS)
+
+@pathlike_compatible
+def real_vid_birthtime(video, tz):
+    """In the case of videos which birthtime is not available will calculate real creation/birth time by subtracting the
+    duration of the video from the modification time.
+
+    Parameters
+    -----
+    video : `PathLike[str]` or `str`
+        Path to video.
+    tz : `timezone`
+        Timezone to convert birthtime timestamp to.
+
+    Returns
+    -----
+    ret : `datetime`
+        Real creation/birth date of video.
+    """
+    return datetime.fromtimestamp(stat(video).st_mtime).astimezone(tz) - timedelta(seconds=vid_duration(video))
+
+
+
+
+
+# ----- MISC -----
+
