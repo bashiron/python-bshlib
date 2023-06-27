@@ -41,23 +41,24 @@ def pathlike_compatible(fun):
     """Convert `PathLike` args to `str`.
     """
 
+    def cnv_any(a):
+        """General conversion.
+        """
+        match a:
+            case PathLike():
+                return str(a)
+            case _:
+                return a
+
     def cnv_p(arg):
         """Convert positional argument.
         """
-        match arg:
-            case PathLike():
-                return str(arg)
-            case _:
-                return arg
+        return cnv_any(arg)
 
     def cnv_k(kwarg):
         """Convert keyword argument.
         """
-        match kwarg:
-            case (k, PathLike() as v):
-                return k, str(v)
-            case kwarg:
-                return kwarg
+        return kwarg[0], cnv_any(kwarg[1])
 
     def wrapper(*args, **kwargs):
         args = tuple(map(cnv_p, args))
