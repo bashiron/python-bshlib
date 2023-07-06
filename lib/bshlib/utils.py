@@ -3,6 +3,7 @@ from pathlib import Path
 import cv2 as cv
 from os import stat
 from datetime import datetime, timedelta
+from collections import namedtuple
 
 from os import PathLike
 from datetime import timezone
@@ -33,6 +34,12 @@ WEEKDAY_MAP = {
     5: 'Sábado',
     6: 'Domingo'
 }
+
+
+class Hdur(namedtuple('Hdur', 'h m s')):
+    """Time duration structure capped at hours, containing hours, minutes and seconds.
+    """
+
 
 # ----- DECORATORS
 
@@ -146,7 +153,22 @@ def real_vid_birthtime(video, tz):
     return datetime.fromtimestamp(stat(video).st_mtime).astimezone(tz) - timedelta(seconds=vid_duration(video))
 
 
+def hour_capped_duration(seconds: int):
+    """Return a named tuple created from an amount of seconds, capped at hours.
 
+    Parameters
+    -----
+    seconds : int
+        Amount of seconds to convert.
+
+    Returns
+    -----
+    ret : Hdur
+        Hdur object containing hours, minutes and seconds.
+     """
+    hs, ms = divmod(seconds, 3600)
+    ms, ss = divmod(ms, 60)
+    return Hdur(hs, ms, ss)
 
 
 # ----- MISC -----
