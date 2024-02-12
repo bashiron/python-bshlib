@@ -35,11 +35,28 @@ WEEKDAY_MAP = {
     6: 'Domingo'
 }
 
-
 class Hdur(namedtuple('Hdur', 'h m s')):
     """Time duration structure capped at hours, containing hours, minutes and seconds.
     """
 
+# ----- CLASSES
+
+class _GetchUnix:
+    """For getting 1 character from stdin.
+    """
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
 
 # ----- DECORATORS
 
@@ -170,6 +187,8 @@ def hour_capped_duration(seconds: int):
     ms, ss = divmod(ms, 60)
     return Hdur(hs, ms, ss)
 
-
 # ----- MISC -----
 
+
+# call to get 1 char from stdin
+getc = _GetchUnix()
