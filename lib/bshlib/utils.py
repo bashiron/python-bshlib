@@ -8,6 +8,8 @@ from collections import namedtuple
 from os import PathLike
 from datetime import timezone
 
+from exception.exception import PathNotExist
+
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
 MONTH_MAP = {
@@ -62,7 +64,7 @@ class _GetchUnix:
 
 # TODO: other possible behavior: the decorator takes a string param with the name of the PathLike param to convert
 def pathlike_compatible(fun):
-    """Convert `PathLike` args to `str`.
+    """Convert `PathLike` function args to `str`.
     """
 
     def cnv_any(a):
@@ -170,7 +172,7 @@ def real_vid_birthtime(video, tz):
     return datetime.fromtimestamp(stat(video).st_mtime).astimezone(tz) - timedelta(seconds=vid_duration(video))
 
 
-def hour_capped_duration(seconds: int):
+def hour_capped_duration(seconds):
     """Return a named tuple created from an amount of seconds, capped at hours.
 
     Parameters
@@ -186,6 +188,21 @@ def hour_capped_duration(seconds: int):
     hs, ms = divmod(seconds, 3600)
     ms, ss = divmod(ms, 60)
     return Hdur(hs, ms, ss)
+
+
+# ----- VALIDATION
+
+
+def req_path(path):
+    """Check for Path existance.
+
+    Parameters
+    -----
+    path : `Path`
+        Path.
+    """
+    if not path.exists():
+        raise PathNotExist
 
 # ----- MISC -----
 
