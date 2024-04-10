@@ -190,6 +190,21 @@ def hour_capped_duration(seconds):
     return Hdur(hs, ms, ss)
 
 
+def super_copyfile(src, dst):
+    """
+    Copy file to destination, creating all intermediate directories if needed.
+
+    Parameters
+    -----
+    src : `PathLike[str]` or `str`
+        Path to file.
+    dst : `PathLike[str]` or `str`
+        Destination directory.
+    """
+    # TODO
+    pass
+
+
 # ----- VALIDATION
 
 
