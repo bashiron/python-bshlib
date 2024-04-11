@@ -1,11 +1,11 @@
 import re
 from pathlib import Path
 import cv2 as cv
-from os import stat
+from os import stat, PathLike, makedirs
 from datetime import datetime, timedelta
 from collections import namedtuple
+from shutil import copy
 
-from os import PathLike
 from datetime import timezone
 
 from exception.exception import PathNotExist
@@ -63,6 +63,7 @@ class _GetchUnix:
 # ----- DECORATORS
 
 # TODO: other possible behavior: the decorator takes a string param with the name of the PathLike param to convert
+# TODO: could also take a param that defines whether to convert to `Path` or to `str`
 def pathlike_compatible(fun):
     """Convert `PathLike` function args to `str`.
     """
@@ -189,7 +190,6 @@ def hour_capped_duration(seconds):
     ms, ss = divmod(ms, 60)
     return Hdur(hs, ms, ss)
 
-
 def super_copyfile(src, dst):
     """
     Copy file to destination, creating all intermediate directories if needed.
@@ -201,8 +201,11 @@ def super_copyfile(src, dst):
     dst : `PathLike[str]` or `str`
         Destination directory.
     """
-    # TODO
-    pass
+    try:
+        copy(src, dst)
+    except IOError:
+        makedirs(dst, exist_ok=False)
+        super_copyfile(src, dst)
 
 
 # ----- VALIDATION
