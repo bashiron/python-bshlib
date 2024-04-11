@@ -1,11 +1,10 @@
 import re
-from pathlib import Path
+import os
+import shutil
 import cv2 as cv
-from os import stat, PathLike, makedirs
+from pathlib import Path
 from datetime import datetime, timedelta
 from collections import namedtuple
-from shutil import copy
-
 from datetime import timezone
 
 from exception.exception import PathNotExist
@@ -72,7 +71,7 @@ def pathlike_compatible(fun):
         """General conversion.
         """
         match a:
-            case PathLike():
+            case os.PathLike():
                 return str(a)
             case _:
                 return a
@@ -142,7 +141,7 @@ def vid_duration(video):
 
     Parameters
     -----
-    video : `PathLike[str]` or `str`
+    video : `os.PathLike[str]` or `str`
         Path to video.
 
     Returns
@@ -160,7 +159,7 @@ def real_vid_birthtime(video, tz):
 
     Parameters
     -----
-    video : `PathLike[str]` or `str`
+    video : `os.PathLike[str]` or `str`
         Path to video.
     tz : `timezone`
         Timezone to convert birthtime timestamp to.
@@ -170,7 +169,7 @@ def real_vid_birthtime(video, tz):
     ret : `datetime`
         Real creation/birth date of video.
     """
-    return datetime.fromtimestamp(stat(video).st_mtime).astimezone(tz) - timedelta(seconds=vid_duration(video))
+    return datetime.fromtimestamp(os.stat(video).st_mtime).astimezone(tz) - timedelta(seconds=vid_duration(video))
 
 
 def hour_capped_duration(seconds):
@@ -196,15 +195,15 @@ def super_copyfile(src, dst):
 
     Parameters
     -----
-    src : `PathLike[str]` or `str`
+    src : `os.PathLike[str]` or `str`
         Path to file.
-    dst : `PathLike[str]` or `str`
+    dst : `os.PathLike[str]` or `str`
         Destination directory.
     """
     try:
-        copy(src, dst)
+        shutil.copy(src, dst)
     except IOError:
-        makedirs(dst, exist_ok=False)
+        os.makedirs(dst, exist_ok=False)
         super_copyfile(src, dst)
 
 

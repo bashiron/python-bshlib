@@ -1,8 +1,6 @@
+import os
+import re
 from pathlib import Path
-from os import mkdir
-from re import compile
-from os import rename, PathLike
-
 from typing import TextIO
 
 def task_op(function):
@@ -29,7 +27,7 @@ class OutputMgr:
         match out_root:
             case Path():
                 self.root = out_root
-            case PathLike() | str():
+            case os.PathLike() | str():
                 self.root = Path(out_root)
             case _:
                 raise TypeError
@@ -42,14 +40,14 @@ class OutputMgr:
 
     def create_root(self):
         try:
-            mkdir(self.root)
+            os.mkdir(self.root)
         except FileExistsError:
             print('directory exists. skipping..')
 
     @task_op
     def create_task_root(self):
         try:
-            mkdir(self.root / self.task)
+            os.mkdir(self.root / self.task)
         except FileExistsError:
             print('directory exists. skipping..')
 
@@ -101,7 +99,7 @@ class OutputMgr:
         """
         taskdir = self.root / self.task
         good_files = list(taskdir.iterdir())
-        rx = compile(self.task + r'_\d+')
+        rx = re.compile(self.task + r'_\d+')
         pred = lambda e: rx.match(e.stem) is not None
         good_files = list(filter(pred, good_files))
         return good_files
@@ -118,7 +116,7 @@ class OutputMgr:
 
         i = 0
         for path, _ in ordered:
-            rename(path, path.with_stem(f"{self.task}_{i}"))
+            os.rename(path, path.with_stem(f"{self.task}_{i}"))
             i += 1
 
     @task_op
@@ -142,7 +140,7 @@ class OutputMgr:
         path : `Path`
             Path of the file to extract from.
         """
-        rx = compile(r'.*_(\d+)')
+        rx = re.compile(r'.*_(\d+)')
         return int(rx.match(path.stem).group(1))
 
 # ----- MISC -----
@@ -158,7 +156,7 @@ class OutputMgr:
         try:
             fd = open(path, mode)
         except FileNotFoundError:
-            mkdir(path.parent)
+            os.mkdir(path.parent)
             # retry
             fd = self.__strong_open(path, mode)
         return fd
