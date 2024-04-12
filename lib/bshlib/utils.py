@@ -226,3 +226,5 @@ def req_path(path):
 
 # call to get 1 char from stdin
 getc = _GetchUnix()
+
+# stuff
