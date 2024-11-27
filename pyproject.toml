@@ -26,5 +26,9 @@ classifiers = [
     "Topic :: Utilities"
 ]
 
+[project.urls]
+Homepage = "https://github.com/bashiron/python-bshlib"
+Issues = "https://github.com/bashiron/python-bshlib/issues"
+
 [tool.setuptools_scm]
 version_file = "lib/bshlib/_version.py"
