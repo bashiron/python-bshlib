@@ -16,6 +16,15 @@ dependencies = [
     'loguru == 0.7.2',
     'opencv-python==4.10.0.84'
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System",
+    "Topic :: Utilities"
+]
 
 [tool.setuptools_scm]
 version_file = "lib/bshlib/_version.py"
