@@ -189,3 +189,5 @@ fabric.properties
 bshlib/experiment.py
 bshlib/_version.py
 util/
+
+# tmp
