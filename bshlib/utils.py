@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 from datetime import timezone
 
-from exception.exception import PathNotExist
+from exception import PathNotExist
 
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
@@ -46,7 +46,7 @@ class _GetchUnix:
     """For getting 1 character from stdin.
     """
     def __init__(self):
-        import tty, sys
+        pass
 
     def __call__(self):
         import sys, tty, termios
