@@ -1,4 +1,4 @@
-from .exception import PathNotExist
+from bshlib.exception import PathNotExist
 
 import re
 import os
