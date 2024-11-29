@@ -31,4 +31,4 @@ Homepage = "https://github.com/bashiron/python-bshlib"
 Issues = "https://github.com/bashiron/python-bshlib/issues"
 
 [tool.setuptools_scm]
-version_file = "bshlib/_version.py"
+version_file = "src/bshlib/_version.py"

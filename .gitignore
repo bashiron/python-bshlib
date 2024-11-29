@@ -186,6 +186,6 @@ fabric.properties
 
 # vvv --- custom --- vvv
 
-bshlib/experiment.py
-bshlib/_version.py
+src/bshlib/experiment.py
+src/bshlib/_version.py
 util/

@@ -1,3 +1,5 @@
+from .exception import PathNotExist
+
 import re
 import os
 import shutil
@@ -7,7 +9,6 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 from datetime import timezone
 
-from exception import PathNotExist
 
 # ----- SPANISH CONVERSIONS FOR PYTHON'S TIME AND DATE MODULES
 
