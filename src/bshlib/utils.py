@@ -120,8 +120,7 @@ def gsub_file(path, pattern: re.Pattern, replacement):
     """Apply substitution to an entire file.
     """
     file = open(path, 'r+', encoding='utf-8')
-    content = file.readlines()
-    content = ''.join(content)
+    content = file.read()
     file.truncate(0)
     file.seek(0)  # not necessary but just in case
     content = re.sub(pattern, replacement, content)
@@ -207,6 +206,16 @@ def super_copyfile(src, dst):
         os.makedirs(dst, exist_ok=False)
         super_copyfile(src, dst)
 
+def super_touch(_file):
+    """Create file and all parent directories.
+
+    Parameters
+    -----
+    _file : `Path`
+        File.
+    """
+    os.makedirs(_file.parent, exist_ok=True)
+    os.mknod(_file)
 
 # ----- VALIDATION
 
