@@ -1,5 +1,8 @@
 class Singleton(type):
     """Generic singleton.
+
+    Inherit by defining it as the metaclass like
+    >>> class MyClass(metaclass=Singleton)
     """
     _instances = {}
 
