@@ -83,7 +83,7 @@ class SuffixMgr:
 
     def __compile(self):
         """
-        Compile internal register.
+        Compile register.
         """
         rx = re.compile(r'(.+)_(\d+)$', re.MULTILINE)
 
@@ -106,3 +106,12 @@ class SuffixMgr:
             else:
                 groups[k] = [piece(i) for i in g]
         self.grouping = Grouping(unique=uniq, suffixed=groups)
+
+    def update(self):
+        """
+        Compile internal register.
+
+        Please run after modifying the list externally.
+        """
+        self.__compile()
+        
