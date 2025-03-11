@@ -1,5 +1,6 @@
+from bshlib.suffix_mgr import SuffixMgr, sfx_rx
+
 import os
-import re
 from pathlib import Path
 from typing import TextIO
 
@@ -98,11 +99,21 @@ class OutputMgr:
             Paths of conventional files.
         """
         taskdir = self.root / self.task
-        good_files = list(taskdir.iterdir())
-        rx = re.compile(self.task + r'_\d+')
-        pred = lambda e: rx.match(e.stem) is not None
-        good_files = list(filter(pred, good_files))
-        return good_files
+        pairs = []
+        for f in taskdir.iterdir():
+            # do local conventional check because it restricts prefix to be the task name
+            if self.is_conventional(f):
+                pairs.append((f, f.stem))
+        conven = SuffixMgr([name for _, name in pairs]).conventional()
+        return [taskdir / f for f, n in pairs if n in conven]
+
+    @task_op
+    def is_conventional(self, path: Path):
+        m = sfx_rx.match(path.stem)
+        if m:
+            return m.group(1) == self.task
+        else:
+            return False
 
     @task_op
     def rearrange(self):
@@ -110,7 +121,7 @@ class OutputMgr:
         caused by file deletion.
         """
         files = self.conventional()
-        nums = map(lambda e: self.extract_number(e), files)
+        nums = [self.extract_number(f) for f in files]
         ordered = list(zip(files, nums))
         ordered.sort(key=lambda e: e[1])
 
@@ -123,14 +134,12 @@ class OutputMgr:
     def next_num(self):
         """Get next file number for task file.
         """
-        taskdir = self.root / self.task
-        files = self.conventional()
-
-        if not taskdir.exists() or len(files) == 0:
-            num = 0
+        names = [f.stem for f in (self.root / self.task).iterdir()]
+        num = SuffixMgr(names).get_num(self.task)
+        if num:
+            return num + 1
         else:
-            num = max([self.extract_number(ch) for ch in files]) + 1
-        return num
+            return 0
 
     def extract_number(self, path):
         """Extract the sequence number from the file.
@@ -140,8 +149,7 @@ class OutputMgr:
         path : `Path`
             Path of the file to extract from.
         """
-        rx = re.compile(r'.*_(\d+)')
-        return int(rx.match(path.stem).group(1))
+        return SuffixMgr.extract(path.stem)
 
 # ----- MISC -----
 

@@ -3,6 +3,7 @@ from itertools import groupby
 import re
 
 Grouping = namedtuple('Grouping', ['unique', 'suffixed'])
+sfx_rx = re.compile(r'(.+)_(\d+)$', re.MULTILINE)
 
 class SuffixMgr:
     """
@@ -85,17 +86,15 @@ class SuffixMgr:
         """
         Compile register.
         """
-        rx = re.compile(r'(.+)_(\d+)$', re.MULTILINE)
-
         def name(i: str):
-            m = rx.match(i)
+            m = sfx_rx.match(i)
             if m:
                 return m.group(1)
             else:
                 return ''
 
         def piece(i: str):
-            return int(rx.match(i).group(2))
+            return int(sfx_rx.match(i).group(2))
 
         uniq = []
         groups = {}
@@ -114,4 +113,16 @@ class SuffixMgr:
         Please run after modifying the list externally.
         """
         self.__compile()
-        
+
+    def conventional(self):
+        """
+        List the names that have a suffix.
+        """
+        return list(set(self.__list) - set(self.grouping.unique))
+
+    @classmethod
+    def extract(cls, string):
+        """
+        Extract number from suffix.
+        """
+        return int(sfx_rx.match(string).group(2))
