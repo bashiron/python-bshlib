@@ -217,6 +217,17 @@ def super_touch(_file):
     os.makedirs(_file.parent, exist_ok=True)
     os.mknod(_file)
 
+def get_keys(d: dict) -> list[str]:
+    """
+    Get keys in dictionary as a list of strings.
+
+    Useful mainly for printing to terminal, since printing the *view* object doesn't look pretty.
+    """
+    keys = []
+    for k in d:
+        keys.append(k)
+    return keys
+
 # ----- VALIDATION
 
 
